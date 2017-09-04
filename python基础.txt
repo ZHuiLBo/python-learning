@@ -613,3 +613,255 @@ dict函数也可用关键字参数来创建字典
 >>> print "zhaohui's phone number is %(zhaohui)s" % phonebook
 以这种方式使用字典时，只要所有给出的键都能在字典中找到，就可以获得任意数量的转换说明符
 这类字符串格式化在模板系统中非常有用
+>>> template = '''<html>
+    <head><title>%(title)s</title></head>
+    <body>
+    <h1>%(title)s</h1>
+    <p>%(text)s</p>
+    </body>'''
+>>> data = {'title':'My Home Page', 'text':'Welcome to my home page!'}
+>>> print template % data
+<html>
+<head><title>My Home Page</title></head>
+<body>
+<h1>My Home Page</h1>
+<p>Welcome to my home page!</p>
+</body>
+8、字典方法
+@ clear方法：清楚字典里的所有项，原地操作，无返回值，或者说返回值是None
+>>> d = {}
+>>> d['name']='zhaohui'
+>>> d['age']=18
+>>> d
+{'age': 18, 'name': 'zhaohui'}
+>>> returnValue=d.clear()
+>>> d
+{}
+>>> print returnValue
+None
+这个方法的作用体现如下：
+>>> x = {}
+>>> y = x           【x和y都关联到同一个字典】
+>>> x['name']='zhaohui'
+>>> y
+{'name':'zhaohui'}
+>>> x = {}    【把x关联到新的字典，y并没有被清空】
+>>> y
+{'name':'zhaohui'}
+如果想清空x和y之前关联的那个字典，应该使用clear方法
+>>> x = {}
+>>> y = x           【x和y都关联到同一个字典】
+>>> x['name']='zhaohui'
+>>> y
+{'name':'zhaohui'}
+>>> x.clear()
+>>> y
+{}
+@ copy方法：返回一个具有相同键值对的新字典（这个方法实现的是浅复制（shallow copy），因为值本身就是相同的，而不是副本）
+>>> x = {'username':'zhaohui','machines':['foo','bar','baz']}
+>>> y = x.copy()
+>>> y['username'] = 'libo'
+>>> y['machines'].remove('bar')
+>>> y
+{'username': 'libo', 'machines': ['foo', 'baz']}
+>>> x
+{'username': 'zhaohui', 'machines': ['foo', 'baz']}
+自己好好体会，修改值还有修改地址的区别
+如果要避免修改到原始数据，应该使用深复制（deep copy），复制其包含所有的值。可以使用copy模块的deepcopy函数来完成操作
+>>> from copy import deepcopy
+>>> d = {}
+>>> d['name'] = ['zhaohui', 'libo']
+>>> c = d.copy()
+>>> dc = deepcopy(d)
+>>> d['name'].append('zhaofan')
+>>> c
+['zhaohui', 'libo', 'zhaofan']
+>>> dc 
+['zhaohui', 'libo']
+@ fromkey方法：使用给定的键建立新的字典，每个键默认对应的值为None
+>>> {}.fromkey(['name','age'])
+{'age':None,'name':None}
+也可以直接在所有字典的类型dict上调用方法
+>>> dict.fromkey(['name','age'])
+{'age':None,'name':None}
+也可以自己提供默认值
+>>> dict.fromkey(['name','age']，‘（unknown）’)
+{'age':‘（unknown）’,'name':‘（unknown）’}
+@ get方法：更宽松的访问字典项的方法，一般来说试图访问字典中不存在项时会报错
+>>> d = {}
+>>> print d['name']
+【报错】
+而get不会
+>>> print d.get('name')
+None
+还可以自定义键不存在时的默认值
+>>> print d.get('name','N/A')
+'N/A'
+如果键存在，就和普通字典查询一样
+@ has_key方法：可以检查字典中是否含有给出的键
+表达式 d.has_key(k)相当于 k in d，喜欢用哪个用哪个，但是Python3.0以后没有has_key方法
+@ items和iteritems
+items方法将所有字典项以列表的方式返回，这些列表项每一项都来自于（键，值）。但项在返回时没有特殊的顺序
+>>> d = {'name':'zhaohui', 'addr':'shenzhen', 'phone':'1234'}
+>>> d.items()
+[('phone', '1234'), ('name', 'zhaohui'), ('addr', 'shenzhen')]
+iteritems方法的作用大致相同，但返回的是迭代器而不是列表
+>>> it=d.iteritems() 
+>>> list(it)
+@ keys和iterkeys
+keys方法将字典中的键以列表的方式返回，而iterkeys返回的是针对键的迭代器
+@ pop方法：用来获得对应给定键的值，并将该键值对从字典中移除
+>>> d = {'x':1, 'y':2}
+>>> d.pop('x')
+1
+>>> d
+{'y':2}
+@ popitem方法类似于list.pop，后者会弹出列表的最后一个元素，popitem弹出随机的项。因为字典没有顺序的概念
+@ setdefault方法，类似于get方法，能够获得与给定键相关联的值，除此之外，setdefault还能在字典中不含有给定键的情况下设定相应的键值
+>>> d = {}
+>>> d.setdefault('name','N/A')
+'N/A'
+>>> d
+{'name':'N/A'}
+>>> d['name']='Gumby'
+>>> d.setdefault('name','N/A')
+'Gumby'
+>>> d
+{'name':'Gumby'}
+当键不存在时，setdefault返回默认值并且相应地更新字典。如果键存在，就返回与其对应的值，但不改变字典。默认值可选，如果不设定，会默认使用None
+@ update方法：利用一个字典项更新另外一个字典
+>>> d = {'name':'zhaohui', 'sex':'man'}
+>>> i = {'name':'libo'}
+>>> d.update(i)
+>>> d
+{'name': 'libo', 'sex': 'man'}
+提供的字典中的项会被添加到旧的字典中，如果有相同的键则会进行覆盖
+@ values和itervalues
+values方法以列表的形式返回字典中的值（itervalues返回值的迭代器），返回值的列表中可以包含重复的元素
+>>> d = {}
+>>> d[1] = 1
+>>> d[2] = 2
+>>> d[3] = 3
+>>> d[4] = 1
+>>> d.values()
+[1,2,3,1]
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+第五章：条件、循环和其他语句
+1、对于很多应用程序来说，用logging模块记日志比print语句更合适
+2、使用逗号输出，自动在两个逗号间加入空格
+>>> print 'Age:',42
+Age: 42
+3、print参数不能像我们预期的那样构成一个元组
+>>> 1,2,3
+>>> print 1,2,3
+1 2 3
+>>> print (1,2,3)
+(1,2,3)
+4、从模块导入函数的时候，可以使用
+import somemodule
+或者
+from somemodule import somefunction
+或者
+from somemodule import somefunction,anotherfunction,yetanotherfunction
+或者
+from somemodule import * 【只有确定自己要从该模块中导入所有函数时才使用这种方法】
+如果两个模块都有open函数，有如下几种解决方法
+@
+>>> import somemodule1
+>>> import somemodule2
+>>> somemodule1.open()
+>>> somemodule2.open()
+@
+在语句末尾加as，给整个模块起别名
+>>> import math as foobar
+>>> foobar.sqrt(4)
+2.0
+为函数提供别名
+>>> from math import sqrt as foobar
+>>> foobar(4)
+2.0
+对于open函数，可以
+>>> from module1 import open as open1
+>>> from module2 import open as open2
+5、赋值
+@ 多个赋值操作可以同时进行：
+>>> x,y,z = 1,2,3
+>>> print x,y,z
+1 2 3
+@ 交换两个变量
+>>> x, y = y, x
+>>> print x,y,z
+2 1 3
+以上两个操作其实叫做序列解包（sequence unpacking）或可选代解包：将多个值的序列解开，然后放到变量的序列中
+即
+>>> values = 1,2,3
+>>> values
+(1,2,3)
+>>> x,y,z = values
+>>> 
+1
+当函数或者方法返回元组（或者其他序列或可迭代对象）时，这个特性尤其有用，可以直接将返回的元组赋值到两个变量中，如
+>>> database = {'name':'zhaohui','age':13}
+>>> key, value = database.popitem()
+>>> key 
+'name'
+>>> value
+'zhaohui'
+它允许函数返回一个以上的值并且打包成元组，然后通过一个赋值语句很容易进行访问。
+所解包的序列中的元素必须和放置在赋值符号=左边的变量数量完全一致，否则会报错
+Python3.0中另一个解包特性：可以像在函数的参数列表中一样使用星号运算符，如下
+a,b,rest* = [1,2,3,4]
+a和b被赋值后，其他值都收集到rest中。
+使用星号的变量也可以放在第1个位置，右侧的赋值语句可以是可迭代对象
+6、链式赋值（chained assignment）
+链式赋值是将同一个值赋给多个变量的捷径，如
+>>> x = y = somefunction()
+和下面语句的效果一样
+>>> y = somefunction()
+>>> x = y
+但不一定和下面的等价
+>>> x = somefunction()
+>>> y = somefunction()
+7、增量赋值（augmented assignment）
+如
+x+=1
+8、语句块
+语句块是条件为真（条件语句）时执行或者执行多次（循环语句）的一组语句，在代码前放置空格来缩进语句即可创建语句块
+在Python中，冒号（:）用来标识语句块的开始
+9、条件和条件语句
+@下面的值再作为布尔表达式时会被解释器看作是假（False）
+0 {} [] () False None ""
+其他的一切都被解释为真（True），也就是说Python中所有值都能被解释为真值（布尔值）
+@bool函数用于转换为布尔值，几乎不需要显式转换，Python会自动转换
+@尽管bool("")==bool([])==False,他们本身并不相等""!=[]，其他不同类型的假值也是如此
+@条件语句示例
+num = input('Enter a number: ')
+if num > 0 :
+    print 'The number is positive'
+elif num < 0 :
+    print 'The number is negative'
+else :
+    print 'The number is zero'
+@可以对条件语句进行嵌套
+10、更复杂的条件
+@ x is y 表示x和y是同一个对象
+  x in y 表示x是y容器的成员
+@ 只有x和y是相同过近似类型的对象时，比较才有意义
+@ x<>y的意思就是x!=y,应避免使用x<>y
+@ Python中的比较运算和赋值运算一样是可以连接的，如0<age<100
+@ is 是同一性运算符，==是相等运算符
+is运算符判断同一性，而不是相等性
+>>> x = y = [1, 2, 3]
+>>> z = [1, 2, 3]
+>>> x == y
+True
+>>> x == z
+True
+>>> x is z
+False
+>>> x is y
+True
+
